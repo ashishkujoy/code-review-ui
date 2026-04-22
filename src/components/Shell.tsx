@@ -1,15 +1,28 @@
-import type { ReactNode } from 'react';
+import { type ReactNode } from 'react';
+import { Cohort } from './Cohort';
 import { Icons } from './Icons';
 
 type Route = 'dashboard' | 'configure' | 'reports' | 'detail' | 'history' | 'settings';
 
-interface SidebarProps {
-  route: Route;
-  setRoute: (r: Route) => void;
+const Brand = () => {
+  return <div className="brand">
+    <div className="brand__mark">/*</div>
+    <div>
+      <div className="brand__name">Code Review</div>
+    </div>
+    <div className="brand__tag">v0.9</div>
+  </div>
 }
 
-export function Sidebar({ route, setRoute }: SidebarProps) {
-  const nav: { id: Route; label: string; icon: ReactNode; count?: number }[] = [
+type NavRouteItemData = {
+  id: Route;
+  label: string;
+  icon: ReactNode;
+  count?: number;
+} 
+
+const Workspace = ({ route, setRoute }: SidebarProps) => {
+  const nav: NavRouteItemData[] = [
     { id: 'dashboard', label: 'Assignments', icon: Icons.grid, count: 6 },
     { id: 'configure', label: 'Configure Review', icon: Icons.sparkle },
     { id: 'reports', label: 'Reports', icon: Icons.report, count: 54 },
@@ -17,68 +30,60 @@ export function Sidebar({ route, setRoute }: SidebarProps) {
     { id: 'settings', label: 'Settings', icon: Icons.settings },
   ];
 
+  return <div>
+    <div className="side__section-title">Workspace</div>
+    <nav className="side__nav">
+      {nav.map((item) => (
+        <div
+          key={item.id}
+          className={'side__item' + (route === item.id ? ' is-active' : '')}
+          onClick={() => setRoute(item.id)}
+        >
+          {item.icon}
+          <span className="side__label">{item.label}</span>
+          {item.count != null && <span className="side__count">{item.count}</span>}
+        </div>
+      ))}
+    </nav>
+  </div>
+}
+
+const getAvatar = (name: string) => name.split(' ')
+  .map(part => part[0].toUpperCase())
+  .join('');
+
+const LoggedInUserSideFoot = (props: { name: string }) => {
+  return <div className="side__foot">
+    <div className="avatar">{getAvatar(props.name)}</div>
+    <div className="side__foot-meta">
+      <div className="side__foot-name">{props.name}</div>
+      <div className="side__foot-org">Mentor · Acme Labs</div>
+    </div>
+  </div>
+}
+
+type SidebarProps = {
+  route: Route;
+  setRoute: (r: Route) => void;
+}
+
+export const Sidebar = ({ route, setRoute }: SidebarProps) => {
   return (
     <aside className="side">
-      <div className="brand">
-        <div className="brand__mark">/*</div>
-        <div>
-          <div className="brand__name">Code Review</div>
-        </div>
-        <div className="brand__tag">v0.9</div>
-      </div>
-
-      <div>
-        <div className="side__section-title">Workspace</div>
-        <nav className="side__nav">
-          {nav.map((item) => (
-            <div
-              key={item.id}
-              className={'side__item' + (route === item.id ? ' is-active' : '')}
-              onClick={() => setRoute(item.id)}
-            >
-              {item.icon}
-              <span className="side__label">{item.label}</span>
-              {item.count != null && <span className="side__count">{item.count}</span>}
-            </div>
-          ))}
-        </nav>
-      </div>
-
-      <div>
-        <div className="side__section-title">Cohorts</div>
-        <nav className="side__nav">
-          <div className="side__item is-active">
-            <span className="dot dot--good" />
-            <span className="side__label">Spring '26 · Backend</span>
-          </div>
-          <div className="side__item">
-            <span className="dot dot--idle" />
-            <span className="side__label">Winter '26 · Frontend</span>
-          </div>
-          <div className="side__item">
-            <span className="dot dot--idle" />
-            <span className="side__label">Fall '25 · Alumni</span>
-          </div>
-        </nav>
-      </div>
-
-      <div className="side__foot">
-        <div className="avatar">RS</div>
-        <div className="side__foot-meta">
-          <div className="side__foot-name">Rahul Sen</div>
-          <div className="side__foot-org">Mentor · Acme Labs</div>
-        </div>
-      </div>
+      <Brand />
+      <Workspace route={route} setRoute={setRoute}/>
+      <Cohort />
+      <LoggedInUserSideFoot name={'Ashish Kumar'} />
     </aside>
   );
 }
 
-interface TopbarProps {
+type TopbarProps = {
   crumbs: string[];
   actions?: ReactNode;
 }
 
-export function Topbar({ crumbs, actions }: TopbarProps) {
+export const Topbar = ({ crumbs, actions }: TopbarProps) => {
   return (
     <div className="topbar">
       <div className="crumbs">
