@@ -3,12 +3,23 @@ import { ASSIGNMENTS } from '../data';
 import { Icons } from '../components/Icons';
 import { Topbar } from '../components/Shell';
 
-function statusChip(s: string): ReactNode {
-  if (s === 'reviewing') return <span className="chip chip--accent"><span className="chip__dot" />Reviewing</span>;
-  if (s === 'complete') return <span className="chip chip--good"><span className="chip__dot" />Complete</span>;
-  if (s === 'draft') return <span className="chip"><span className="chip__dot" />Draft</span>;
-  if (s === 'scheduled') return <span className="chip chip--warn"><span className="chip__dot" />Scheduled</span>;
-  return <span className="chip">{s}</span>;
+const statusChip = (s: string): ReactNode => {
+  switch (s) {
+    case 'reviewing': return <span className="chip chip--accent"></span>
+    case 'complete': return <>
+      <span className="chip chip--good">
+        <span className="chip__dot" />Complete</span>
+    </>;
+    case 'draft': return <>
+      <span className="chip">
+        <span className="chip__dot" />Draft</span>
+    </>;
+    case 'scheduled': return <>
+      <span className="chip chip--warn">
+        <span className="chip__dot" />Scheduled</span>
+    </>;
+    default: return <span className="chip">{s}</span>;
+  }
 }
 
 interface Props {
