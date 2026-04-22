@@ -1,6 +1,6 @@
 import type { SVGProps } from 'react';
 
-interface IconProps extends SVGProps<SVGSVGElement> {
+interface IconProps extends Omit<SVGProps<SVGSVGElement>, "d"> {
   d?: React.ReactNode;
   size?: number;
   sw?: number;
