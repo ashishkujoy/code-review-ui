@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
 import { Sidebar, Topbar } from './components/Shell';
 import { TwicksSection, type Tweaks } from './components/TweaksPanel';
+import { useCohorts } from './components/Cohort';
+import type { Cohort } from './api';
 import { ScreenConfigure } from './screens/Configure';
 import { ScreenDashboard } from './screens/Dashboard';
 import { ScreenDetail } from './screens/Detail';
@@ -14,6 +16,16 @@ export default function App() {
   const [tweaks, setTweaks] = useState<Tweaks>({ theme: 'light', density: 'comfortable' });
   const [tweaksOn, setTweaksOn] = useState(false);
 
+  const cohortsState = useCohorts();
+  const cohorts = cohortsState.cohorts;
+  const [selectedCohortId, setSelectedCohortId] = useState<number | null>(null);
+
+  useEffect(() => {
+    if (cohortsState.cohorts.length > 0 && selectedCohortId === null) {
+      setSelectedCohortId(cohorts[0].id);
+    }
+  }, [cohorts, selectedCohortId]);
+
   useEffect(() => {
     localStorage.setItem('cr.route', route);
   }, [route]);
@@ -25,10 +37,14 @@ export default function App() {
 
   return (
     <div className="app">
-      <Sidebar route={route} setRoute={setRoute} />
+      <Sidebar route={route} setRoute={setRoute} cohort={cohortsState} />
       <main className="main">
         {route === 'dashboard' && (
-          <ScreenDashboard onOpen={() => setRoute('reports')} onConfigure={() => setRoute('configure')} />
+          <ScreenDashboard
+            onOpen={() => setRoute('reports')}
+            onConfigure={() => setRoute('configure')}
+            cohort={cohortsState.selectedCohort || { id: -1, name: "loading..." }}
+          />
         )}
         {route === 'configure' && (
           <ScreenConfigure onReports={() => setRoute('reports')} />

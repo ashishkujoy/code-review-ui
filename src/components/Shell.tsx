@@ -1,5 +1,5 @@
 import { type ReactNode } from 'react';
-import { Cohort } from './Cohort';
+import { Cohort, type CohortProps } from './Cohort';
 import { Icons } from './Icons';
 
 type Route = 'dashboard' | 'configure' | 'reports' | 'detail' | 'history' | 'settings';
@@ -65,14 +65,15 @@ const LoggedInUserSideFoot = (props: { name: string }) => {
 type SidebarProps = {
   route: Route;
   setRoute: (r: Route) => void;
+  cohort: CohortProps;
 }
 
-export const Sidebar = ({ route, setRoute }: SidebarProps) => {
+export const Sidebar = ({ route, setRoute, cohort }: SidebarProps) => {
   return (
     <aside className="side">
       <Brand />
-      <Workspace route={route} setRoute={setRoute}/>
-      <Cohort />
+      <Workspace route={route} setRoute={setRoute} cohort={cohort}/>
+      <Cohort {...cohort} />
       <LoggedInUserSideFoot name={'Ashish Kumar'} />
     </aside>
   );

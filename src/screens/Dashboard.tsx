@@ -2,6 +2,7 @@ import type { ReactNode } from 'react';
 import { ASSIGNMENTS } from '../data';
 import { Icons } from '../components/Icons';
 import { Topbar } from '../components/Shell';
+import type { Cohort } from '../api';
 
 const statusChip = (s: string): ReactNode => {
   switch (s) {
@@ -23,15 +24,16 @@ const statusChip = (s: string): ReactNode => {
 }
 
 interface Props {
+  cohort: Cohort;
   onOpen: () => void;
   onConfigure: () => void;
 }
 
-export function ScreenDashboard({ onOpen, onConfigure }: Props) {
+export function ScreenDashboard({ onOpen, onConfigure, cohort }: Props) {
   return (
     <>
       <Topbar
-        crumbs={["Spring '26 · Backend", 'Assignments']}
+        crumbs={[cohort.name, 'Assignments']}
         actions={
           <>
             <button className="btn">
