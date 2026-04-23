@@ -1,27 +1,9 @@
-import type { ReactNode } from 'react';
-import { ASSIGNMENTS } from '../data';
+import type { Cohort } from '../api';
+import Assignments from '../components/Assignments';
 import { Icons } from '../components/Icons';
 import { Topbar } from '../components/Shell';
-import type { Cohort } from '../api';
+import { ASSIGNMENTS } from '../data';
 
-const statusChip = (s: string): ReactNode => {
-  switch (s) {
-    case 'reviewing': return <span className="chip chip--accent"></span>
-    case 'complete': return <>
-      <span className="chip chip--good">
-        <span className="chip__dot" />Complete</span>
-    </>;
-    case 'draft': return <>
-      <span className="chip">
-        <span className="chip__dot" />Draft</span>
-    </>;
-    case 'scheduled': return <>
-      <span className="chip chip--warn">
-        <span className="chip__dot" />Scheduled</span>
-    </>;
-    default: return <span className="chip">{s}</span>;
-  }
-}
 
 interface Props {
   cohort: Cohort;
@@ -89,44 +71,7 @@ export function ScreenDashboard({ onOpen, onConfigure, cohort }: Props) {
           <span className="muted">{ASSIGNMENTS.length} total</span>
         </div>
 
-        <div className="card-grid">
-          {ASSIGNMENTS.map((a) => (
-            <div key={a.id} className="card" onClick={onOpen}>
-              <div className="card__head">
-                <div>
-                  <div className="card__title">{a.name}</div>
-                  <div className="card__repo">
-                    {Icons.git}
-                    {a.repo}
-                  </div>
-                </div>
-                {statusChip(a.status)}
-              </div>
-              <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-                <div className="bar" style={{ maxWidth: '100%' }}>
-                  <div className="bar__fill" style={{ width: `${(a.submitted / a.total) * 100}%` }} />
-                </div>
-                <span className="mono" style={{ fontSize: 12, color: 'var(--ink-3)' }}>
-                  {a.submitted}/{a.total}
-                </span>
-              </div>
-              <div className="card__meta">
-                <div>
-                  <div className="card__meta-k">Lang</div>
-                  <div className="card__meta-v">{a.language}</div>
-                </div>
-                <div>
-                  <div className="card__meta-k">Due</div>
-                  <div className="card__meta-v">{a.dueDate}</div>
-                </div>
-                <div>
-                  <div className="card__meta-k">Avg</div>
-                  <div className="card__meta-v">{a.avgScore ?? '—'}</div>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
+        <Assignments cohortId={cohort.id} onOpen={onOpen}/>
       </div>
     </>
   );
