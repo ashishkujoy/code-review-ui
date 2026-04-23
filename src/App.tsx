@@ -42,7 +42,6 @@ export default function App() {
         {route === 'dashboard' && (
           <ScreenDashboard
             onOpen={() => setRoute('reports')}
-            onConfigure={() => setRoute('configure')}
             cohort={cohortsState.selectedCohort || { id: -1, name: "loading..." }}
           />
         )}

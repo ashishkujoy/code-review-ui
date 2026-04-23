@@ -1,5 +1,7 @@
+import { useState } from 'react';
 import type { Cohort } from '../api';
 import Assignments from '../components/Assignments';
+import { CreateAssignmentModal } from '../components/CreateAssignmentModal';
 import { Icons } from '../components/Icons';
 import { Topbar } from '../components/Shell';
 import { ASSIGNMENTS } from '../data';
@@ -8,10 +10,17 @@ import { ASSIGNMENTS } from '../data';
 interface Props {
   cohort: Cohort;
   onOpen: () => void;
-  onConfigure: () => void;
 }
 
-export function ScreenDashboard({ onOpen, onConfigure, cohort }: Props) {
+export function ScreenDashboard({ onOpen, cohort }: Props) {
+  const [modalOpen, setModalOpen] = useState(false);
+  const [refreshKey, setRefreshKey] = useState(0);
+
+  const handleCreated = () => {
+    setModalOpen(false);
+    setRefreshKey((k) => k + 1);
+  };
+
   return (
     <>
       <Topbar
@@ -21,8 +30,8 @@ export function ScreenDashboard({ onOpen, onConfigure, cohort }: Props) {
             <button className="btn">
               {Icons.download}Export
             </button>
-            <button className="btn btn--primary" onClick={onConfigure}>
-              {Icons.plus}New Review
+            <button className="btn btn--primary" onClick={() => setModalOpen(true)}>
+              {Icons.plus}New Assignment
             </button>
           </>
         }
@@ -71,8 +80,16 @@ export function ScreenDashboard({ onOpen, onConfigure, cohort }: Props) {
           <span className="muted">{ASSIGNMENTS.length} total</span>
         </div>
 
-        <Assignments cohortId={cohort.id} onOpen={onOpen}/>
+        <Assignments key={refreshKey} cohortId={cohort.id} onOpen={onOpen}/>
       </div>
+
+      {modalOpen && (
+        <CreateAssignmentModal
+          cohortId={cohort.id}
+          onClose={() => setModalOpen(false)}
+          onCreated={handleCreated}
+        />
+      )}
     </>
   );
 }

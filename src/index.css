@@ -954,6 +954,52 @@ a { color: inherit; text-decoration: none; }
   .split { grid-template-columns: 360px 1fr; }
 }
 
+/* Modal */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: color-mix(in oklch, var(--ink) 30%, transparent);
+  backdrop-filter: blur(2px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+}
+.modal {
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 16px 48px color-mix(in oklch, var(--ink) 12%, transparent);
+  width: 100%;
+  max-width: 440px;
+  padding: 24px;
+}
+.modal__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+.modal__title {
+  font-size: 16px;
+  font-weight: 600;
+  margin: 0;
+}
+.modal__foot {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 8px;
+}
+.modal__error {
+  font-size: 12.5px;
+  color: var(--bad);
+  background: var(--bad-soft);
+  border-radius: var(--radius);
+  padding: 8px 12px;
+  margin-bottom: 16px;
+}
+
 .empty {
   padding: 80px 20px;
   text-align: center;
