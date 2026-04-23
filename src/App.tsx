@@ -46,7 +46,10 @@ export default function App() {
           />
         )}
         {route === 'configure' && (
-          <ScreenConfigure onReports={() => setRoute('reports')} />
+          <ScreenConfigure
+            onReports={() => setRoute('reports')}
+            cohort={cohortsState.selectedCohort || { id: -1, name: "loading..." }}
+          />
         )}
         {route === 'reports' && (
           <ScreenReports onBack={() => setRoute('dashboard')} onDetail={() => setRoute('detail')} />
