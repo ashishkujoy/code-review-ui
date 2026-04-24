@@ -22,7 +22,7 @@ const statusChip = (s: string): ReactNode => {
   }
 }
 
-const useAssignments = (cohortId: number) => {
+export const useAssignments = (cohortId: number) => {
   const [assignments, setAssignments] = useState<Assignment[]>([]);
   const [error, setError] = useState<Error | null>(null);
   const [loaded, setLoaded] = useState(false);
