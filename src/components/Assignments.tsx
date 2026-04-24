@@ -68,11 +68,23 @@ export const useAssignments = (cohortId: number) => {
   const updateGlob = (mode: GlobMode, glob: string, updateType: 'ADD' | 'REMOVE') => {
     if (!selectedAssignment) return;
     const updatedGlobs = updateGlobs(selectedAssignment.globs, mode, glob, updateType);
-    const updatedAssignment = { ...selectedAssignment, globs: updatedGlobs };
-    console.log(selectedAssignment, updatedAssignment)
-    setSelectedAssignment(updatedAssignment);
-    setAssignments(assignments.map(a => a.id === selectedAssignment.id ? updatedAssignment : a));
-    updateAssignment(cohortId, updatedAssignment);
+    updateAssignmentState({ ...selectedAssignment, globs: updatedGlobs });
+  }
+
+  const updatePrompt = (prompt: string) => {
+    if (!selectedAssignment) return;
+    updateAssignmentState({ ...selectedAssignment, prompt });
+  }
+
+  const updateModel = (model: string) => {
+    if (!selectedAssignment) return;
+    updateAssignmentState({ ...selectedAssignment, model });
+  }
+
+  const updateAssignmentState = (assignment: Assignment) => {
+    setSelectedAssignment(assignment);
+    setAssignments(assignments.map(a => a.id === selectedAssignment.id ? assignment : a));
+    updateAssignment(cohortId, assignment);
   }
 
   return {
@@ -80,7 +92,9 @@ export const useAssignments = (cohortId: number) => {
     loaded,
     error,
     selectedAssignment,
+    updatePrompt,
     updateGlob,
+    updateModel,
     setSelectedAssignment,
   }
 }

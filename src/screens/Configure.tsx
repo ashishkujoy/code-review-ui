@@ -2,10 +2,11 @@ import { useState, type Dispatch, type SetStateAction } from 'react';
 import type { Cohort } from '../api';
 import { useAssignments } from '../components/Assignments';
 import AssignmentDropdown from '../components/AssignmentSelector';
+import { Button } from '../components/Button';
 import { Icons } from '../components/Icons';
 import { Topbar } from '../components/Shell';
 import { DEFAULT_PROMPT } from '../data';
-import {} from "../api";
+import { } from "../api";
 
 interface Props {
   onReports: () => void;
@@ -133,12 +134,16 @@ const Glob = ({ includes, removeGlob, excludes, addGlob }: GlobProps) => {
 
 type PromptProps = {
   prompt: string;
-  setPrompt: Dispatch<SetStateAction<string>>;
+  setPrompt: (p: string) => void;
   model: string;
-  setModel: Dispatch<SetStateAction<string>>;
+  setModel: (m: string) => void;
+  availableModels: string[]
 }
 
-const Prompt = ({ prompt, setPrompt, model, setModel }: PromptProps) => {
+const Prompt = ({ prompt, setPrompt, model, setModel, availableModels }: PromptProps) => {
+  const [draft, setDraft] = useState(prompt);
+  const dirty = draft !== prompt;
+
   return <>
     <div className="field">
       <label className="field__label">Review Prompt</label>
@@ -148,17 +153,25 @@ const Prompt = ({ prompt, setPrompt, model, setModel }: PromptProps) => {
       <textarea
         className="textarea"
         rows={14}
-        value={prompt}
-        onChange={(e) => setPrompt(e.target.value)}
+        value={draft}
+        onChange={(e) => setDraft(e.target.value)}
       />
+      <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 8 }}>
+        <Button variant="primary" disabled={!dirty} onClick={() => setPrompt(draft)}>
+          Save Prompt
+        </Button>
+      </div>
     </div>
     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
       <div className="field">
         <label className="field__label">Model</label>
         <select className="select" value={model} onChange={(e) => setModel(e.target.value)}>
-          <option value="claude-sonnet-4.5">Sonnet 4.5 · Balanced</option>
-          <option value="claude-opus-4">Opus 4 · Deepest</option>
-          <option value="claude-haiku-4.5">Haiku 4.5 · Fastest</option>
+          {
+            availableModels.map(model => <option 
+              key={model} 
+              value={model}
+              >{model}</option>)
+          }
         </select>
       </div>
     </div>
@@ -168,8 +181,6 @@ const Prompt = ({ prompt, setPrompt, model, setModel }: PromptProps) => {
 export function ScreenConfigure({ onReports, cohort }: Props) {
   const assignments = useAssignments(cohort.id);
   const [openDD, setOpenDD] = useState(false);
-  const [prompt, setPrompt] = useState(DEFAULT_PROMPT);
-  const [model, setModel] = useState('claude-sonnet-4.5');
   const [running, setRunning] = useState(false);
 
 
@@ -219,7 +230,12 @@ export function ScreenConfigure({ onReports, cohort }: Props) {
               }
               addGlob={(mode, glob) => assignments.updateGlob(mode, glob, "ADD")}
             />
-            <Prompt prompt={prompt} setPrompt={setPrompt} model={model} setModel={setModel} />
+            <Prompt
+              prompt={assignments.selectedAssignment.prompt}
+              setPrompt={assignments.updatePrompt}
+              model={assignments.selectedAssignment.model}
+              availableModels={["claude-sonnet-4.5", "claude-opus-4", "claude-haiku-4.5"]}
+              setModel={assignments.updateModel} />
           </div>
         </div>}
       </div>

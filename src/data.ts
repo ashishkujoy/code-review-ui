@@ -5,14 +5,16 @@ export interface Assignment {
   submitted: number;
   total: number;
   dueDate: string;
-  status: 'reviewing' | 'complete' | 'draft' | 'scheduled';
+  status: "reviewing" | "complete" | "draft" | "scheduled";
   language: string;
   avgScore: number | null;
   lastRun: string;
+  prompt: string;
+  model: string;
   globs: {
     inc: string[];
     exc: string[];
-  }
+  };
 }
 
 export interface Intern {
@@ -23,8 +25,8 @@ export interface Intern {
   critical: number;
   major: number;
   minor: number;
-  status: 'passed' | 'review' | 'flagged';
-  runStatus: 'done' | 'running' | 'queued';
+  status: "passed" | "review" | "flagged";
+  runStatus: "done" | "running" | "queued";
   time: string;
   pr: number;
   commits: number;
@@ -33,7 +35,7 @@ export interface Intern {
 
 export interface Finding {
   id: string;
-  severity: 'critical' | 'major' | 'minor';
+  severity: "critical" | "major" | "minor";
   title: string;
   file: string;
   body: string;
@@ -42,105 +44,208 @@ export interface Finding {
 
 export const ASSIGNMENTS: Assignment[] = [
   {
-    id: 'asgn-1201',
-    name: 'Week 4 — Rate-Limited API Client',
-    repo: 'cohort-s26/week-04-ratelimiter',
+    id: "asgn-1201",
+    name: "Week 4 — Rate-Limited API Client",
+    repo: "cohort-s26/week-04-ratelimiter",
     submitted: 54,
     total: 58,
-    dueDate: 'Apr 20',
-    status: 'reviewing',
-    language: 'TypeScript',
+    dueDate: "Apr 20",
+    status: "reviewing",
+    language: "TypeScript",
     avgScore: 78,
-    lastRun: '2h ago',
+    lastRun: "2h ago",
+    prompt: "",
     globs: {
       inc: [],
       exc: [],
-    }
+    },
+    model: "gpt-oss:latest"
   },
   {
-    id: 'asgn-1198',
-    name: 'Week 3 — Auth Flow with JWT',
-    repo: 'cohort-s26/week-03-auth',
+    id: "asgn-1198",
+    name: "Week 3 — Auth Flow with JWT",
+    repo: "cohort-s26/week-03-auth",
     submitted: 57,
     total: 58,
-    dueDate: 'Apr 13',
-    status: 'complete',
-    language: 'TypeScript',
+    dueDate: "Apr 13",
+    status: "complete",
+    language: "TypeScript",
     avgScore: 82,
-    lastRun: '6d ago',
+    lastRun: "6d ago",
+    prompt: "",
+    model: "gpt-oss:latest",
     globs: {
       inc: [],
       exc: [],
-    }
+    },
   },
   {
-    id: 'asgn-1194',
-    name: 'Week 2 — React Data Table',
-    repo: 'cohort-s26/week-02-table',
+    id: "asgn-1194",
+    name: "Week 2 — React Data Table",
+    repo: "cohort-s26/week-02-table",
     submitted: 58,
     total: 58,
-    dueDate: 'Apr 06',
-    status: 'complete',
-    language: 'React / TS',
+    dueDate: "Apr 06",
+    status: "complete",
+    language: "React / TS",
     avgScore: 85,
-    lastRun: '13d ago',
+    lastRun: "13d ago",
+    prompt: "",
+    model: "gpt-oss:latest",
     globs: {
       inc: [],
       exc: [],
-    }
+    },
   },
   {
-    id: 'asgn-1187',
-    name: 'Week 1 — HTTP from scratch',
-    repo: 'cohort-s26/week-01-http',
+    id: "asgn-1187",
+    name: "Week 1 — HTTP from scratch",
+    repo: "cohort-s26/week-01-http",
     submitted: 58,
     total: 58,
-    dueDate: 'Mar 30',
-    status: 'complete',
-    language: 'Go',
+    dueDate: "Mar 30",
+    status: "complete",
+    language: "Go",
     avgScore: 74,
-    lastRun: '20d ago',
+    lastRun: "20d ago",
+    prompt: "",
+    model: "gpt-oss:latest",
     globs: {
       inc: [],
       exc: [],
-    }
+    },
   },
   {
-    id: 'asgn-1210',
-    name: 'Capstone — Mini Kubernetes Scheduler',
-    repo: 'cohort-s26/capstone',
+    id: "asgn-1210",
+    name: "Capstone — Mini Kubernetes Scheduler",
+    repo: "cohort-s26/capstone",
     submitted: 12,
     total: 58,
-    dueDate: 'May 14',
-    status: 'draft',
-    language: 'Go',
+    dueDate: "May 14",
+    status: "draft",
+    language: "Go",
     avgScore: null,
-    lastRun: '—',
+    lastRun: "—",
+    prompt: "",
+    model: "gpt-5.2:latest",
     globs: {
       inc: [],
       exc: [],
-    }
+    },
   },
   {
-    id: 'asgn-1205',
-    name: 'Week 5 — SQL Query Optimizer',
-    repo: 'cohort-s26/week-05-sql',
+    id: "asgn-1205",
+    name: "Week 5 — SQL Query Optimizer",
+    repo: "cohort-s26/week-05-sql",
     submitted: 0,
     total: 58,
-    dueDate: 'Apr 27',
-    status: 'scheduled',
-    language: 'PostgreSQL',
+    dueDate: "Apr 27",
+    status: "scheduled",
+    language: "PostgreSQL",
     avgScore: null,
-    lastRun: '—',
+    lastRun: "—",
+    prompt: "",
+    model: "gpt-oss:latest",
     globs: {
       inc: [],
       exc: [],
-    }
+    },
   },
 ];
 
-const FIRST_NAMES = ['Aarav','Priya','Mei','Daniel','Zara','Luca','Anaya','Kenji','Sofia','Noah','Ravi','Emma','Ibrahim','Ji-woo','Marcus','Amara','Elena','Rohan','Chen','Leila','Arjun','Nadia','Tomas','Keisha','Hiro','Maya','Diego','Fatima','Oscar','Yuki','Ayaan','Lena','Ethan','Nisha','Jonas','Adaeze','Kiran','Isla','Farah','Sam','Vihaan','Zuri','Rafael','Mira','Ben','Anika','Noor','Theo','Divya','Lukas','Eva','Hassan','Priyanka','Nate','Saanvi','Mateo','Vera','Owen','Lara'];
-const LAST_NAMES = ['Patel','Zhang','Okafor','Silva','Cohen','Müller','Rossi','Tanaka','García','Singh','Kim','Hassan','Novak','Reddy','Nakamura','Adebayo','Ortega','Fischer','Wang','Johansson','Shah','Chen','Morales','Iwu','Brandt','Petrov','Osei','Kumar','Jensen','Ng'];
+const FIRST_NAMES = [
+  "Aarav",
+  "Priya",
+  "Mei",
+  "Daniel",
+  "Zara",
+  "Luca",
+  "Anaya",
+  "Kenji",
+  "Sofia",
+  "Noah",
+  "Ravi",
+  "Emma",
+  "Ibrahim",
+  "Ji-woo",
+  "Marcus",
+  "Amara",
+  "Elena",
+  "Rohan",
+  "Chen",
+  "Leila",
+  "Arjun",
+  "Nadia",
+  "Tomas",
+  "Keisha",
+  "Hiro",
+  "Maya",
+  "Diego",
+  "Fatima",
+  "Oscar",
+  "Yuki",
+  "Ayaan",
+  "Lena",
+  "Ethan",
+  "Nisha",
+  "Jonas",
+  "Adaeze",
+  "Kiran",
+  "Isla",
+  "Farah",
+  "Sam",
+  "Vihaan",
+  "Zuri",
+  "Rafael",
+  "Mira",
+  "Ben",
+  "Anika",
+  "Noor",
+  "Theo",
+  "Divya",
+  "Lukas",
+  "Eva",
+  "Hassan",
+  "Priyanka",
+  "Nate",
+  "Saanvi",
+  "Mateo",
+  "Vera",
+  "Owen",
+  "Lara",
+];
+const LAST_NAMES = [
+  "Patel",
+  "Zhang",
+  "Okafor",
+  "Silva",
+  "Cohen",
+  "Müller",
+  "Rossi",
+  "Tanaka",
+  "García",
+  "Singh",
+  "Kim",
+  "Hassan",
+  "Novak",
+  "Reddy",
+  "Nakamura",
+  "Adebayo",
+  "Ortega",
+  "Fischer",
+  "Wang",
+  "Johansson",
+  "Shah",
+  "Chen",
+  "Morales",
+  "Iwu",
+  "Brandt",
+  "Petrov",
+  "Osei",
+  "Kumar",
+  "Jensen",
+  "Ng",
+];
 
 function mulberry32(seed: number) {
   return function () {
@@ -158,15 +263,28 @@ function buildInterns(seed = 42, count = 54): Intern[] {
   for (let i = 0; i < count; i++) {
     const f = pick(FIRST_NAMES);
     const l = pick(LAST_NAMES);
-    const handle = '@' + (f[0] + l).toLowerCase().replace(/[^a-z]/g, '') + String(10 + Math.floor(rng() * 90));
+    const handle = "@" + (f[0] + l).toLowerCase().replace(/[^a-z]/g, "") +
+      String(10 + Math.floor(rng() * 90));
     let base = 50 + rng() * 45;
     if (rng() > 0.85) base = 30 + rng() * 25;
     const score = Math.round(base);
-    const critical = score < 55 ? 1 + Math.floor(rng() * 3) : score < 70 ? Math.floor(rng() * 2) : 0;
+    const critical = score < 55
+      ? 1 + Math.floor(rng() * 3)
+      : score < 70
+      ? Math.floor(rng() * 2)
+      : 0;
     const major = Math.floor(rng() * 4) + (score < 60 ? 2 : 0);
     const minor = 2 + Math.floor(rng() * 6);
-    const status: Intern['status'] = score >= 80 ? 'passed' : score >= 60 ? 'review' : 'flagged';
-    const runStatus: Intern['runStatus'] = rng() > 0.96 ? 'running' : rng() > 0.98 ? 'queued' : 'done';
+    const status: Intern["status"] = score >= 80
+      ? "passed"
+      : score >= 60
+      ? "review"
+      : "flagged";
+    const runStatus: Intern["runStatus"] = rng() > 0.96
+      ? "running"
+      : rng() > 0.98
+      ? "queued"
+      : "done";
     out.push({
       id: `intern-${1000 + i}`,
       name: `${f} ${l}`,
@@ -188,7 +306,8 @@ function buildInterns(seed = 42, count = 54): Intern[] {
 
 export const INTERNS = buildInterns(7, 54);
 
-export const DEFAULT_PROMPT = `You are a senior staff engineer reviewing a junior's submission.
+export const DEFAULT_PROMPT =
+  `You are a senior staff engineer reviewing a junior's submission.
 
 Focus areas:
 1. Correctness — does the rate limiter actually enforce the contract under concurrent load?
@@ -206,11 +325,12 @@ Be direct. Do not hedge. If the submission is solid, say so in one line and stop
 
 export const FINDINGS_SAMPLE: Finding[] = [
   {
-    id: 'f1',
-    severity: 'critical',
-    title: 'Race condition in token bucket refill',
-    file: 'src/limiter/bucket.ts:47–63',
-    body: 'The refill calculation reads `lastRefill` and writes `tokens` without a lock. Under concurrent `take()` calls, two callers can each see the same stale `lastRefill`, both add the same delta, and double-credit the bucket. This silently breaks the rate guarantee under load.',
+    id: "f1",
+    severity: "critical",
+    title: "Race condition in token bucket refill",
+    file: "src/limiter/bucket.ts:47–63",
+    body:
+      "The refill calculation reads `lastRefill` and writes `tokens` without a lock. Under concurrent `take()` calls, two callers can each see the same stale `lastRefill`, both add the same delta, and double-credit the bucket. This silently breaks the rate guarantee under load.",
     code: `<span class="del"><span class="ln">47</span>- refill() {
 </span><span class="del"><span class="ln">48</span>-   const now = Date.now();
 </span><span class="del"><span class="ln">49</span>-   const delta = (now - this.lastRefill) * this.rate;
@@ -227,31 +347,35 @@ export const FINDINGS_SAMPLE: Finding[] = [
 </span><span class="add"><span class="ln">54</span>+ }</span>`,
   },
   {
-    id: 'f2',
-    severity: 'major',
-    title: 'Missing backoff on Redis connection failure',
-    file: 'src/store/redis.ts:12–18',
-    body: '`connect()` is called once at construction. If Redis is briefly unreachable at startup, the process exits with an unhandled rejection instead of retrying. Production limiters should degrade gracefully to a local fallback or back off with jitter.',
+    id: "f2",
+    severity: "major",
+    title: "Missing backoff on Redis connection failure",
+    file: "src/store/redis.ts:12–18",
+    body:
+      "`connect()` is called once at construction. If Redis is briefly unreachable at startup, the process exits with an unhandled rejection instead of retrying. Production limiters should degrade gracefully to a local fallback or back off with jitter.",
   },
   {
-    id: 'f3',
-    severity: 'major',
-    title: 'Unbounded queue in `waitForToken`',
-    file: 'src/limiter/queue.ts:22',
-    body: 'Callers waiting for tokens are pushed into an array with no cap. A burst can exhaust memory. Cap at a configurable `maxPending` and reject with `429` once full.',
+    id: "f3",
+    severity: "major",
+    title: "Unbounded queue in `waitForToken`",
+    file: "src/limiter/queue.ts:22",
+    body:
+      "Callers waiting for tokens are pushed into an array with no cap. A burst can exhaust memory. Cap at a configurable `maxPending` and reject with `429` once full.",
   },
   {
-    id: 'f4',
-    severity: 'minor',
-    title: 'Public API uses `any` for options',
-    file: 'src/index.ts:4',
-    body: 'The exported factory takes `options: any`. Define a `LimiterOptions` interface so consumers get autocompletion and compile-time checks.',
+    id: "f4",
+    severity: "minor",
+    title: "Public API uses `any` for options",
+    file: "src/index.ts:4",
+    body:
+      "The exported factory takes `options: any`. Define a `LimiterOptions` interface so consumers get autocompletion and compile-time checks.",
   },
   {
-    id: 'f5',
-    severity: 'minor',
-    title: 'Tests assert elapsed time with `toBe`',
-    file: 'tests/limiter.test.ts:88',
-    body: 'Time-based assertions are flaky on CI. Use `toBeGreaterThanOrEqual` with a small lower bound and an upper bound that allows for scheduler jitter.',
+    id: "f5",
+    severity: "minor",
+    title: "Tests assert elapsed time with `toBe`",
+    file: "tests/limiter.test.ts:88",
+    body:
+      "Time-based assertions are flaky on CI. Use `toBeGreaterThanOrEqual` with a small lower bound and an upper bound that allows for scheduler jitter.",
   },
 ];
