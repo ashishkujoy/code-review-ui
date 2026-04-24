@@ -3,16 +3,19 @@ import { Sidebar, Topbar } from './components/Shell';
 import { TwicksSection, type Tweaks } from './components/TweaksPanel';
 import { useCohorts } from './components/Cohort';
 import type { Cohort } from './api';
-import { ScreenConfigure } from './screens/Configure';
 import { ScreenDashboard } from './screens/Dashboard';
 import { ScreenDetail } from './screens/Detail';
 import { ScreenReports } from './screens/Reports';
 
-type Route = 'dashboard' | 'configure' | 'reports' | 'detail' | 'history' | 'settings';
+type Route = 'dashboard' | 'reports' | 'detail' | 'history' | 'settings';
 
 
 export default function App() {
-  const [route, setRoute] = useState<Route>(() => (localStorage.getItem('cr.route') as Route) || 'dashboard');
+  const validRoutes: Route[] = ['dashboard', 'reports', 'detail', 'history', 'settings'];
+  const [route, setRoute] = useState<Route>(() => {
+    const stored = localStorage.getItem('cr.route') as Route;
+    return validRoutes.includes(stored) ? stored : 'dashboard';
+  });
   const [tweaks, setTweaks] = useState<Tweaks>({ theme: 'light', density: 'comfortable' });
   const [tweaksOn, setTweaksOn] = useState(false);
 
@@ -42,12 +45,6 @@ export default function App() {
         {route === 'dashboard' && (
           <ScreenDashboard
             onOpen={() => setRoute('reports')}
-            cohort={cohortsState.selectedCohort || { id: -1, name: "loading..." }}
-          />
-        )}
-        {route === 'configure' && (
-          <ScreenConfigure
-            onReports={() => setRoute('reports')}
             cohort={cohortsState.selectedCohort || { id: -1, name: "loading..." }}
           />
         )}

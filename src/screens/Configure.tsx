@@ -1,244 +1,199 @@
-import { useState, type Dispatch, type SetStateAction } from 'react';
-import type { Cohort } from '../api';
+import { useEffect, useState } from 'react';
 import { useAssignments } from '../components/Assignments';
-import AssignmentDropdown from '../components/AssignmentSelector';
 import { Button } from '../components/Button';
 import { Icons } from '../components/Icons';
-import { Topbar } from '../components/Shell';
-import { DEFAULT_PROMPT } from '../data';
-import { } from "../api";
 
-interface Props {
-  onReports: () => void;
-  cohort: Cohort;
-}
+type GlobMode = 'inc' | 'exc';
 
-type RunReviewBtnProps = {
-  runReview: () => void;
-  running: boolean;
-}
-
-const RunReviewBtn = ({ runReview, running }: RunReviewBtnProps) => {
-  return <button className="btn btn--primary" onClick={runReview} disabled={running}>
-    {running ? (
-      <>
-        <span className="queue-spinner" />
-        Running…
-      </>
-    ) : (
-      <>
-        {Icons.play}Run Review
-      </>
-    )}
-  </button>
-}
-
-const PageHeader = () => {
-  return <div className="page-head">
-    <div>
-      <h1 className="page-title">Configure Review</h1>
-      <p className="page-subtitle">
-        Pick the assignment, narrow to the files that matter, and describe what a good review looks like. The AI will run against all submitted repos.
-      </p>
-    </div>
-  </div>
-}
-
-
-
-type GlobProps = {
-  includes: string[];
-  excludes: string[];
-  removeGlob: (mode: GlobMode, index: number) => void;
-  addGlob: (mode: GlobMode, glob: string) => void;
-}
-
-const GlobRow = ({ type, glob, onClick }: { type: string, glob: string, onClick: () => void }) => {
-  return <div className="glob">
-    <span className={`glob__mode glob__mode--${type}`}>{type === "inc" ? "INC" : "EXC"}</span>
+const GlobRow = ({ type, glob, onClick }: { type: string; glob: string; onClick: () => void }) => (
+  <div className="glob">
+    <span className={`glob__mode glob__mode--${type}`}>{type === 'inc' ? 'INC' : 'EXC'}</span>
     <span className="glob__pattern">{glob}</span>
-    <button className="glob__rm" onClick={onClick}>
-      {Icons.x}
-    </button>
+    <button className="glob__rm" onClick={onClick}>{Icons.x}</button>
   </div>
-}
+);
 
-type GlobMode = "inc" | "exc";
-
-type GlobRowProps = {
+const GlobList = ({ includes, excludes, removeGlob }: {
   includes: string[];
   excludes: string[];
-  removeGlob: (m: GlobMode, i: number) => void
-}
-
-const GlobList = ({ includes, excludes, removeGlob }: GlobRowProps) => {
-  return <div className="glob-list">
+  removeGlob: (m: GlobMode, i: number) => void;
+}) => (
+  <div className="glob-list">
     {includes.map((g, i) => (
-      <GlobRow key={'i' + i} type="inc" glob={g} onClick={() => removeGlob("inc", i)} />
+      <GlobRow key={'i' + i} type="inc" glob={g} onClick={() => removeGlob('inc', i)} />
     ))}
     {excludes.map((g, i) => (
-      <GlobRow key={'i' + i} type="exc" glob={g} onClick={() => removeGlob("exc", i)} />
+      <GlobRow key={'e' + i} type="exc" glob={g} onClick={() => removeGlob('exc', i)} />
     ))}
   </div>
-}
+);
 
-const GlobModes = ({ mode, setMode }: { mode: GlobMode; setMode: (m: GlobMode) => void; }) => {
-  return <div className="seg">
-    <button className={mode === 'inc' ? 'is-on' : ''} onClick={() => setMode('inc')}>
-      Include
-    </button>
-    <button className={mode === 'exc' ? 'is-on' : ''} onClick={() => setMode('exc')}>
-      Exclude
-    </button>
+const GlobModes = ({ mode, setMode }: { mode: GlobMode; setMode: (m: GlobMode) => void }) => (
+  <div className="seg">
+    <button className={mode === 'inc' ? 'is-on' : ''} onClick={() => setMode('inc')}>Include</button>
+    <button className={mode === 'exc' ? 'is-on' : ''} onClick={() => setMode('exc')}>Exclude</button>
   </div>
-}
+);
 
-const GlobInput = ({ onSubmit }: { onSubmit: (g: string) => void; }) => {
-  const [glob, setGlob] = useState("");
+const GlobInput = ({ onSubmit }: { onSubmit: (g: string) => void }) => {
+  const [glob, setGlob] = useState('');
+  const submit = () => {
+    const v = glob.trim();
+    if (!v) return;
+    onSubmit(v);
+    setGlob('');
+  };
+  return (
+    <>
+      <input
+        className="input"
+        placeholder="e.g. src/**/*.ts"
+        value={glob}
+        onChange={(e) => setGlob(e.target.value)}
+        onKeyDown={(e) => e.key === 'Enter' && submit()}
+      />
+      <button className="btn" onClick={submit}>Add</button>
+    </>
+  );
+};
 
-  const handleAddGlob = () => {
-    const newGlob = glob.trim();
-    if (!newGlob) return;
-    onSubmit(newGlob);
-    setGlob("");
-  }
-  return <>
-    <input
-      className="input"
-      placeholder="e.g. src/**/*.ts"
-      value={glob}
-      onChange={(e) => setGlob(e.target.value)}
-      onKeyDown={(e) => e.key === 'Enter' && handleAddGlob()}
-    />
-    <button className="btn" onClick={handleAddGlob}>
-      Add
-    </button>
-  </>
-}
-
-const Glob = ({ includes, removeGlob, excludes, addGlob }: GlobProps) => {
-  const [globMode, setGlobMode] = useState<GlobMode>("inc");
-
-  return <div className="field">
-    <label className="field__label">Files to review</label>
-    <div className="field__hint" style={{ marginBottom: 10 }}>
-      Glob patterns. Include rules narrow to files that should be reviewed; exclude rules skip generated or vendor code.
+const GlobSection = ({ includes, excludes, removeGlob, addGlob }: {
+  includes: string[];
+  excludes: string[];
+  removeGlob: (m: GlobMode, i: number) => void;
+  addGlob: (m: GlobMode, glob: string) => void;
+}) => {
+  const [globMode, setGlobMode] = useState<GlobMode>('inc');
+  return (
+    <div className="field">
+      <label className="field__label">Files to review</label>
+      <div className="field__hint" style={{ marginBottom: 10 }}>
+        Glob patterns. Include rules narrow to files that should be reviewed; exclude rules skip generated or vendor code.
+      </div>
+      <GlobList includes={includes} excludes={excludes} removeGlob={removeGlob} />
+      <div className="glob-add">
+        <GlobModes mode={globMode} setMode={setGlobMode} />
+        <GlobInput onSubmit={(g) => addGlob(globMode, g)} />
+      </div>
     </div>
-    <GlobList includes={includes} excludes={excludes} removeGlob={removeGlob} />
-    <div className="glob-add">
-      <GlobModes mode={globMode} setMode={setGlobMode} />
-      <GlobInput onSubmit={(glob: string) => addGlob(globMode, glob)} />
-    </div>
-  </div>
-}
+  );
+};
 
-type PromptProps = {
+const PromptSection = ({ prompt, setPrompt, model, setModel, availableModels }: {
   prompt: string;
   setPrompt: (p: string) => void;
   model: string;
   setModel: (m: string) => void;
-  availableModels: string[]
-}
-
-const Prompt = ({ prompt, setPrompt, model, setModel, availableModels }: PromptProps) => {
+  availableModels: string[];
+}) => {
   const [draft, setDraft] = useState(prompt);
   const dirty = draft !== prompt;
 
-  return <>
-    <div className="field">
-      <label className="field__label">Review Prompt</label>
-      <div className="field__hint" style={{ marginBottom: 8 }}>
-        Instructions for the AI reviewer. Be specific about severity, format, and tone.
+  useEffect(() => { setDraft(prompt); }, [prompt]);
+
+  return (
+    <>
+      <div className="field">
+        <label className="field__label">Review Prompt</label>
+        <div className="field__hint" style={{ marginBottom: 8 }}>
+          Instructions for the AI reviewer. Be specific about severity, format, and tone.
+        </div>
+        <textarea
+          className="textarea"
+          rows={10}
+          value={draft}
+          onChange={(e) => setDraft(e.target.value)}
+        />
+        <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 8 }}>
+          <Button variant="primary" disabled={!dirty} onClick={() => setPrompt(draft)}>
+            Save Prompt
+          </Button>
+        </div>
       </div>
-      <textarea
-        className="textarea"
-        rows={14}
-        value={draft}
-        onChange={(e) => setDraft(e.target.value)}
-      />
-      <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 8 }}>
-        <Button variant="primary" disabled={!dirty} onClick={() => setPrompt(draft)}>
-          Save Prompt
-        </Button>
-      </div>
-    </div>
-    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
       <div className="field">
         <label className="field__label">Model</label>
         <select className="select" value={model} onChange={(e) => setModel(e.target.value)}>
-          {
-            availableModels.map(model => <option 
-              key={model} 
-              value={model}
-              >{model}</option>)
-          }
+          {availableModels.map((m) => <option key={m} value={m}>{m}</option>)}
         </select>
       </div>
-    </div>
-  </>
+    </>
+  );
+};
+
+interface ConfigureModalProps {
+  cohortId: number;
+  assignmentId: string;
+  onClose: () => void;
 }
 
-export function ScreenConfigure({ onReports, cohort }: Props) {
-  const assignments = useAssignments(cohort.id);
-  const [openDD, setOpenDD] = useState(false);
+export function ConfigureModal({ cohortId, assignmentId, onClose }: ConfigureModalProps) {
+  const assignments = useAssignments(cohortId);
   const [running, setRunning] = useState(false);
 
+  useEffect(() => {
+    if (assignments.loaded) {
+      const match = assignments.assignments.find((a) => a.id === assignmentId);
+      if (match) assignments.setSelectedAssignment(match);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [assignments.loaded, assignmentId]);
 
   const runReview = () => {
     if (running) return;
     setRunning(true);
-    const names = ['priyaPatel33', 'zaraCohen18', 'kenjiTanaka41', 'noahSilva22', 'meiZhang09', 'lucaRossi14'];
-
     const tick = (i: number) => {
-      if (i >= names.length) {
-        setTimeout(() => setRunning(false), 400);
-        return;
-      }
+      if (i >= 6) { setTimeout(() => setRunning(false), 400); return; }
       setTimeout(() => tick(i + 1), 600);
     };
     setTimeout(() => tick(0), 500);
   };
 
-  return (
-    <>
-      <Topbar
-        crumbs={[cohort.name, 'New Review']}
-        actions={
-          <>
-            <button className="btn">Save Draft</button>
-            <RunReviewBtn runReview={runReview} running={running} />
-          </>
-        }
-      />
+  const a = assignments.selectedAssignment;
 
-      <div className="page">
-        <PageHeader />
-        {assignments.loaded && assignments.selectedAssignment && <div className="config-grid">
+  return (
+    <div className="modal-backdrop" onClick={onClose}>
+      <div className="modal modal--wide" onClick={(e) => e.stopPropagation()}>
+        <div className="modal__head">
           <div>
-            <AssignmentDropdown
-              openDD={openDD}
-              setOpenDD={setOpenDD}
-              assignments={assignments.assignments}
-              assignment={assignments.selectedAssignment}
-              setAssignment={assignments.setSelectedAssignment}
-            />
-            <Glob
-              includes={assignments.selectedAssignment.globs.inc}
-              excludes={assignments.selectedAssignment.globs.exc}
-              removeGlob={(mode, index) =>
-                assignments.updateGlob(mode, assignments.selectedAssignment.globs[mode][index], "REMOVE")
-              }
-              addGlob={(mode, glob) => assignments.updateGlob(mode, glob, "ADD")}
-            />
-            <Prompt
-              prompt={assignments.selectedAssignment.prompt}
-              setPrompt={assignments.updatePrompt}
-              model={assignments.selectedAssignment.model}
-              availableModels={["claude-sonnet-4.5", "claude-opus-4", "claude-haiku-4.5"]}
-              setModel={assignments.updateModel} />
+            <h2 className="modal__title">Configure Review</h2>
+            {a && <div className="modal__subtitle">{a.name}</div>}
           </div>
-        </div>}
+          <button className="btn btn--ghost btn--icon" onClick={onClose} aria-label="Close">
+            {Icons.x}
+          </button>
+        </div>
+
+        <div className="modal__body">
+          {assignments.loaded && a ? (
+            <>
+              <GlobSection
+                includes={a.globs.inc}
+                excludes={a.globs.exc}
+                removeGlob={(mode, index) =>
+                  assignments.updateGlob(mode, a.globs[mode][index], 'REMOVE')
+                }
+                addGlob={(mode, glob) => assignments.updateGlob(mode, glob, 'ADD')}
+              />
+              <PromptSection
+                prompt={a.prompt}
+                setPrompt={assignments.updatePrompt}
+                model={a.model}
+                setModel={assignments.updateModel}
+                availableModels={['claude-sonnet-4-5', 'claude-opus-4', 'claude-haiku-4-5']}
+              />
+            </>
+          ) : (
+            <div style={{ padding: '24px 0', color: 'var(--ink-4)', textAlign: 'center' }}>Loading…</div>
+          )}
+        </div>
+
+        <div className="modal__foot">
+          <button className="btn" onClick={onClose}>Close</button>
+          <button className="btn btn--primary" onClick={runReview} disabled={running}>
+            {running ? <><span className="queue-spinner" />Running…</> : <>{Icons.play}Run Review</>}
+          </button>
+        </div>
       </div>
-    </>
+    </div>
   );
 }

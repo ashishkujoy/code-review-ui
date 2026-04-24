@@ -2,7 +2,7 @@ import { type ReactNode } from 'react';
 import { Cohort, type CohortProps } from './Cohort';
 import { Icons } from './Icons';
 
-type Route = 'dashboard' | 'configure' | 'reports' | 'detail' | 'history' | 'settings';
+type Route = 'dashboard' | 'reports' | 'detail' | 'history' | 'settings';
 
 const Brand = () => {
   return <div className="brand">
@@ -24,7 +24,6 @@ type NavRouteItemData = {
 const Workspace = ({ route, setRoute }: SidebarProps) => {
   const nav: NavRouteItemData[] = [
     { id: 'dashboard', label: 'Assignments', icon: Icons.grid, count: 6 },
-    { id: 'configure', label: 'Configure Review', icon: Icons.sparkle },
     { id: 'reports', label: 'Reports', icon: Icons.report, count: 54 },
     { id: 'history', label: 'Run History', icon: Icons.history },
     { id: 'settings', label: 'Settings', icon: Icons.settings },

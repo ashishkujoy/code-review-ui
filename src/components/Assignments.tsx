@@ -2,6 +2,7 @@ import { useEffect, useState, type ReactNode } from "react";
 import { Icons } from "./Icons"
 import type { Assignment } from "../data";
 import { fetchAssignments, updateAssignment } from "../api";
+import { ConfigureModal } from "../screens/Configure";
 
 const statusChip = (s: string): ReactNode => {
   switch (s) {
@@ -99,7 +100,7 @@ export const useAssignments = (cohortId: number) => {
   }
 }
 
-const Status = (props: { name: string; status: string; repo: string }) => {
+const Status = (props: { name: string; status: string; repo: string; onGear: (e: React.MouseEvent) => void }) => {
   return <div className="card__head">
     <div>
       <div className="card__title">{props.name}</div>
@@ -108,7 +109,17 @@ const Status = (props: { name: string; status: string; repo: string }) => {
         {props.repo}
       </div>
     </div>
-    {statusChip(props.status)}
+    <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+      {statusChip(props.status)}
+      <button
+        className="btn btn--ghost btn--icon card__gear"
+        onClick={props.onGear}
+        aria-label="Configure review"
+        title="Configure review"
+      >
+        {Icons.settings}
+      </button>
+    </div>
   </div>
 }
 
@@ -148,15 +159,31 @@ const Meta = (props: {
 
 const Assignments = (props: { cohortId: number; onOpen: () => void }) => {
   const { assignments } = useAssignments(props.cohortId);
-  return <div className="card-grid">
-    {assignments.map((a) => (
-      <div key={a.id} className="card" onClick={props.onOpen}>
-        <Status name={a.name} status={a.status} repo={a.repo} />
-        <Progress completedRatio={a.submitted / a.total} />
-        <Meta language={a.language} dueDate={a.dueDate} avgScore={a.avgScore} />
-      </div>
-    ))}
-  </div>
+  const [configuringId, setConfiguringId] = useState<string | null>(null);
+
+  return <>
+    <div className="card-grid">
+      {assignments.map((a) => (
+        <div key={a.id} className="card" onClick={props.onOpen}>
+          <Status
+            name={a.name}
+            status={a.status}
+            repo={a.repo}
+            onGear={(e) => { e.stopPropagation(); setConfiguringId(a.id); }}
+          />
+          <Progress completedRatio={a.submitted / a.total} />
+          <Meta language={a.language} dueDate={a.dueDate} avgScore={a.avgScore} />
+        </div>
+      ))}
+    </div>
+    {configuringId !== null && (
+      <ConfigureModal
+        cohortId={props.cohortId}
+        assignmentId={configuringId}
+        onClose={() => setConfiguringId(null)}
+      />
+    )}
+  </>
 }
 
 export default Assignments;
