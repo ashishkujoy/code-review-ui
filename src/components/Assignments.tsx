@@ -1,7 +1,7 @@
 import { useEffect, useState, type ReactNode } from "react";
 import { Icons } from "./Icons"
 import type { Assignment } from "../data";
-import { fetchAssignments } from "../api";
+import { fetchAssignments, updateAssignment } from "../api";
 
 const statusChip = (s: string): ReactNode => {
   switch (s) {
@@ -22,22 +22,67 @@ const statusChip = (s: string): ReactNode => {
   }
 }
 
+export type GlobMode = "inc" | "exc";
+
+export type Globs = {
+  inc: string[];
+  exc: string[];
+}
+
+const updateGlob = (globs: string[], glob: string, updateType: GlobUpdateType) => {
+  if (updateType === 'ADD') {
+    return [...globs, glob];
+  }
+  return globs.filter(g => g !== glob);
+}
+
+const updateGlobs = (globs: Globs, mode: GlobMode, glob: string, updateType: GlobUpdateType) => {
+  if (mode === 'inc') {
+    return { inc: updateGlob(globs.inc, glob, updateType), exc: globs.exc }
+  }
+  return { exc: updateGlob(globs.exc, glob, updateType), inc: globs.inc }
+}
+
+type GlobUpdateType = 'ADD' | 'REMOVE';
+
 export const useAssignments = (cohortId: number) => {
   const [assignments, setAssignments] = useState<Assignment[]>([]);
   const [error, setError] = useState<Error | null>(null);
   const [loaded, setLoaded] = useState(false);
+  const [selectedAssignment, setSelectedAssignment] = useState<Assignment>([][0]);
 
   useEffect(() => {
-    if (!loaded) {
+    if (!loaded && cohortId !== -1) {
       fetchAssignments(cohortId)
-        .then(setAssignments)
+        .then(assignments => {
+          setAssignments(assignments);
+          setSelectedAssignment(assignments[0] || null);
+        })
         .catch(setError)
         .finally(() => setLoaded(true))
     }
 
   }, [cohortId, loaded]);
 
-  return { assignments, loaded, error }
+
+  const updateGlob = (mode: GlobMode, glob: string, updateType: 'ADD' | 'REMOVE') => {
+    if (!selectedAssignment) return;
+    const updatedGlobs = updateGlobs(selectedAssignment.globs, mode, glob, updateType);
+    const updatedAssignment = { ...selectedAssignment, globs: updatedGlobs };
+    console.log(selectedAssignment, updatedAssignment)
+    setSelectedAssignment(updatedAssignment);
+    setAssignments(assignments.map(a => a.id === selectedAssignment.id ? updatedAssignment : a));
+    updateAssignment(cohortId, updatedAssignment);
+  }
+
+  return {
+    assignments,
+    loaded,
+    error,
+    selectedAssignment,
+    updateGlob,
+    setSelectedAssignment,
+  }
 }
 
 const Status = (props: { name: string; status: string; repo: string }) => {

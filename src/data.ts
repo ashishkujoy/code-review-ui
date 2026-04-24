@@ -9,6 +9,10 @@ export interface Assignment {
   language: string;
   avgScore: number | null;
   lastRun: string;
+  globs: {
+    inc: string[];
+    exc: string[];
+  }
 }
 
 export interface Intern {
@@ -48,6 +52,10 @@ export const ASSIGNMENTS: Assignment[] = [
     language: 'TypeScript',
     avgScore: 78,
     lastRun: '2h ago',
+    globs: {
+      inc: [],
+      exc: [],
+    }
   },
   {
     id: 'asgn-1198',
@@ -60,6 +68,10 @@ export const ASSIGNMENTS: Assignment[] = [
     language: 'TypeScript',
     avgScore: 82,
     lastRun: '6d ago',
+    globs: {
+      inc: [],
+      exc: [],
+    }
   },
   {
     id: 'asgn-1194',
@@ -72,6 +84,10 @@ export const ASSIGNMENTS: Assignment[] = [
     language: 'React / TS',
     avgScore: 85,
     lastRun: '13d ago',
+    globs: {
+      inc: [],
+      exc: [],
+    }
   },
   {
     id: 'asgn-1187',
@@ -84,6 +100,10 @@ export const ASSIGNMENTS: Assignment[] = [
     language: 'Go',
     avgScore: 74,
     lastRun: '20d ago',
+    globs: {
+      inc: [],
+      exc: [],
+    }
   },
   {
     id: 'asgn-1210',
@@ -96,6 +116,10 @@ export const ASSIGNMENTS: Assignment[] = [
     language: 'Go',
     avgScore: null,
     lastRun: '—',
+    globs: {
+      inc: [],
+      exc: [],
+    }
   },
   {
     id: 'asgn-1205',
@@ -108,6 +132,10 @@ export const ASSIGNMENTS: Assignment[] = [
     language: 'PostgreSQL',
     avgScore: null,
     lastRun: '—',
+    globs: {
+      inc: [],
+      exc: [],
+    }
   },
 ];
 

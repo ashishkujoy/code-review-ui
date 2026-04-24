@@ -1,10 +1,11 @@
-import { useEffect, useState, type Dispatch, type SetStateAction } from 'react';
+import { useState, type Dispatch, type SetStateAction } from 'react';
 import type { Cohort } from '../api';
+import { useAssignments } from '../components/Assignments';
 import AssignmentDropdown from '../components/AssignmentSelector';
 import { Icons } from '../components/Icons';
 import { Topbar } from '../components/Shell';
-import { ASSIGNMENTS, DEFAULT_PROMPT } from '../data';
-import { useAssignments } from '../components/Assignments';
+import { DEFAULT_PROMPT } from '../data';
+import {} from "../api";
 
 interface Props {
   onReports: () => void;
@@ -165,31 +166,12 @@ const Prompt = ({ prompt, setPrompt, model, setModel }: PromptProps) => {
 }
 
 export function ScreenConfigure({ onReports, cohort }: Props) {
-  const { assignments, loaded: assignmentLoaded } = useAssignments(cohort.id);
-  const [assignment, setAssignment] = useState(assignments[0]);
+  const assignments = useAssignments(cohort.id);
   const [openDD, setOpenDD] = useState(false);
-  const [includes, setIncludes] = useState(['src/**/*.ts', 'src/**/*.tsx', 'tests/**/*.test.ts']);
-  const [excludes, setExcludes] = useState(['**/node_modules/**', 'dist/**', '**/*.min.js']);
   const [prompt, setPrompt] = useState(DEFAULT_PROMPT);
   const [model, setModel] = useState('claude-sonnet-4.5');
   const [running, setRunning] = useState(false);
 
-  useEffect(() => {
-    if(assignmentLoaded) {
-      setAssignment(assignments[0]);
-    }
-  }, [assignmentLoaded]);
-
-
-  const addGlob = (mode: GlobMode, glob: string) => {
-    if (mode === 'inc') setIncludes([...includes, glob]);
-    else setExcludes([...excludes, glob.trim()]);
-  };
-
-  const removeGlob = (mode: 'inc' | 'exc', i: number) => {
-    if (mode === 'inc') setIncludes(includes.filter((_, idx) => idx !== i));
-    else setExcludes(excludes.filter((_, idx) => idx !== i));
-  };
 
   const runReview = () => {
     if (running) return;
@@ -206,8 +188,6 @@ export function ScreenConfigure({ onReports, cohort }: Props) {
     setTimeout(() => tick(0), 500);
   };
 
-  console.log(assignmentLoaded, assignments);
-
   return (
     <>
       <Topbar
@@ -222,16 +202,23 @@ export function ScreenConfigure({ onReports, cohort }: Props) {
 
       <div className="page">
         <PageHeader />
-        {assignmentLoaded && assignment && <div className="config-grid">
+        {assignments.loaded && assignments.selectedAssignment && <div className="config-grid">
           <div>
             <AssignmentDropdown
               openDD={openDD}
               setOpenDD={setOpenDD}
-              assignments={assignments}
-              assignment={assignment}
-              setAssignment={setAssignment}
+              assignments={assignments.assignments}
+              assignment={assignments.selectedAssignment}
+              setAssignment={assignments.setSelectedAssignment}
             />
-            <Glob includes={includes} excludes={excludes} removeGlob={removeGlob} addGlob={addGlob} />
+            <Glob
+              includes={assignments.selectedAssignment.globs.inc}
+              excludes={assignments.selectedAssignment.globs.exc}
+              removeGlob={(mode, index) =>
+                assignments.updateGlob(mode, assignments.selectedAssignment.globs[mode][index], "REMOVE")
+              }
+              addGlob={(mode, glob) => assignments.updateGlob(mode, glob, "ADD")}
+            />
             <Prompt prompt={prompt} setPrompt={setPrompt} model={model} setModel={setModel} />
           </div>
         </div>}

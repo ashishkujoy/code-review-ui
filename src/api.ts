@@ -10,21 +10,36 @@ export async function fetchCohorts(): Promise<Cohort[]> {
   return res.json();
 }
 
-export const fetchAssignments = async(cohortId: number): Promise<Assignment[]> => {
+export const fetchAssignments = async (
+  cohortId: number,
+): Promise<Assignment[]> => {
   const res = await fetch(`${BASE_URL}/cohorts/${cohortId}/assignments`);
   if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
   return res.json();
-}
+};
 
 export const createAssignment = async (
   cohortId: number,
-  data: { name: string; githubName: string }
+  data: { name: string; githubName: string },
 ): Promise<Assignment> => {
   const res = await fetch(`${BASE_URL}/cohorts/${cohortId}/assignments`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data),
   });
   if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
   return res.json();
-}
+};
+
+export const updateAssignment = async (
+  cohortId: number,
+  assignment: Assignment,
+) => {
+  const res = await fetch(`${BASE_URL}/cohorts/${cohortId}/assignments/${assignment.id}`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(assignment),
+  });
+  if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
+  return res.json();
+};
