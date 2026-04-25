@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useAssignments } from '../hooks/useAssignments';
 import { Button } from '../components/Button';
 import { Icons } from '../components/Icons';
@@ -87,9 +87,12 @@ const PromptSection = ({ prompt, setPrompt, model, setModel, availableModels }: 
   availableModels: string[];
 }) => {
   const [draft, setDraft] = useState(prompt);
+  const [prevPrompt, setPrevPrompt] = useState(prompt);
+  if (prevPrompt !== prompt) {
+    setPrevPrompt(prompt);
+    setDraft(prompt);
+  }
   const dirty = draft !== prompt;
-
-  useEffect(() => { setDraft(prompt); }, [prompt]);
 
   return (
     <>

@@ -1,19 +1,13 @@
-import { useState, useEffect } from 'react';
-import { type Cohort as CohortData, fetchCohorts } from '../api';
+import { useState } from 'react';
+import type { Cohort as CohortData } from '../api';
+import { type CohortProps } from '../hooks/useCohorts';
+import { ConfigureCohortModal } from './ConfigureCohortModal';
 import { CreateCohortModal } from './CreateCohortModal';
 import { Icons } from './Icons';
 
-export interface CohortProps {
-  cohorts: CohortData[];
-  loading: boolean;
-  error: Error | null;
-  selectedId: string | null;
-  onSelect: (id: string) => void;
-  onCohortCreated: (cohort: CohortData) => void;
-}
-
-export const Cohort = ({ cohorts, loading, error, selectedId, onSelect, onCohortCreated }: CohortProps) => {
-  const [showModal, setShowModal] = useState(false);
+export const Cohort = ({ cohorts, loading, error, selectedId, onSelect, onCohortCreated, onCohortUpdated }: CohortProps) => {
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [configureTarget, setConfigureTarget] = useState<CohortData | null>(null);
 
   return (
     <div>
@@ -22,7 +16,7 @@ export const Cohort = ({ cohorts, loading, error, selectedId, onSelect, onCohort
         <button
           className="btn btn--ghost btn--icon"
           style={{ padding: 2 }}
-          onClick={() => setShowModal(true)}
+          onClick={() => setShowCreateModal(true)}
           title="New cohort"
         >
           {Icons.plus}
@@ -34,75 +28,43 @@ export const Cohort = ({ cohorts, loading, error, selectedId, onSelect, onCohort
         {cohorts.map(cohort => (
           <div
             key={cohort.id}
-            className={`side__item ${cohort.id === selectedId ? 'is-active' : ''}`}
+            className={`side__item side__item--cohort ${cohort.id === selectedId ? 'is-active' : ''}`}
             onClick={() => onSelect(cohort.id)}
           >
             <span className={`dot ${cohort.id === selectedId ? 'dot-good' : 'dot--idle'}`} />
             <span className="side__label">{cohort.name}</span>
+            <button
+              className="btn btn--ghost btn--icon side__item-configure"
+              onClick={(e) => { e.stopPropagation(); setConfigureTarget(cohort); }}
+              title="Configure cohort"
+              aria-label="Configure cohort"
+            >
+              {Icons.settings}
+            </button>
           </div>
         ))}
       </nav>
-      {showModal && (
+
+      {showCreateModal && (
         <CreateCohortModal
-          onClose={() => setShowModal(false)}
+          onClose={() => setShowCreateModal(false)}
           onCreated={(cohort) => {
             onCohortCreated(cohort);
-            setShowModal(false);
+            setShowCreateModal(false);
+          }}
+        />
+      )}
+
+      {configureTarget && (
+        <ConfigureCohortModal
+          cohort={configureTarget}
+          onClose={() => setConfigureTarget(null)}
+          onUpdated={(updated) => {
+            onCohortUpdated(updated);
+            setConfigureTarget(updated);
           }}
         />
       )}
     </div>
   );
-};
-
-export type CohortsState = CohortProps & {
-  selectedCohort: CohortData | null;
-}
-
-export const useCohorts = (): CohortsState => {
-  const [cohorts, setCohorts] = useState<CohortData[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<Error | null>(null);
-  const [selectedId, setSelectedId] = useState<string>("");
-
-  const selectedCohort = cohorts.find(cohort => cohort.id === selectedId) || null;
-
-  useEffect(() => {
-    fetchCohorts()
-      .then((cohorts) => {
-        const sorted = [...cohorts].sort((a, b) => {
-          if (!a.startDate && !b.startDate) return 0;
-          if (!a.startDate) return 1;
-          if (!b.startDate) return -1;
-          return b.startDate.localeCompare(a.startDate);
-        });
-        setCohorts(sorted);
-        setSelectedId(sorted[0]?.id || "");
-      })
-      .catch((err: unknown) => setError(err instanceof Error ? err : new Error(String(err))))
-      .finally(() => setLoading(false));
-  }, []);
-
-  const onCohortCreated = (cohort: CohortData) => {
-    setCohorts((prev) => {
-      const next = [...prev, cohort];
-      return next.sort((a, b) => {
-        if (!a.startDate && !b.startDate) return 0;
-        if (!a.startDate) return 1;
-        if (!b.startDate) return -1;
-        return b.startDate.localeCompare(a.startDate);
-      });
-    });
-    setSelectedId(cohort.id);
-  };
-
-  return {
-    cohorts,
-    loading,
-    error,
-    onSelect: setSelectedId,
-    selectedId: selectedId || "",
-    selectedCohort,
-    onCohortCreated,
-  };
 };

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useCohorts } from './components/Cohort';
+import { useCohorts } from './hooks/useCohorts';
 import { Sidebar, Topbar } from './components/Shell';
 import { TwicksSection, type Tweaks } from './components/TweaksPanel';
 import { ScreenDashboard } from './screens/Dashboard';
@@ -19,14 +19,6 @@ export default function App() {
   const [tweaksOn, setTweaksOn] = useState(false);
 
   const cohortsState = useCohorts();
-  const cohorts = cohortsState.cohorts;
-  const [selectedCohortId, setSelectedCohortId] = useState("");
-
-  useEffect(() => {
-    if (cohortsState.cohorts.length > 0 && selectedCohortId === "") {
-      setSelectedCohortId(cohorts[0].id);
-    }
-  }, [cohorts, selectedCohortId]);
 
   useEffect(() => {
     localStorage.setItem('cr.route', route);

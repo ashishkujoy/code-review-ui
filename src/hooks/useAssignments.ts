@@ -55,7 +55,7 @@ export const useAssignments = (cohortId: string, initialAssignmentId?: string) =
         .catch(setError)
         .finally(() => setLoaded(true));
     }
-  }, [cohortId, loaded]);
+  }, [cohortId, loaded, initialAssignmentId]);
 
   const updateGlob = (
     mode: GlobMode,

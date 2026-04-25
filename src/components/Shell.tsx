@@ -1,5 +1,6 @@
 import { type ReactNode } from 'react';
-import { Cohort, type CohortProps } from './Cohort';
+import { Cohort } from './Cohort';
+import { type CohortProps } from '../hooks/useCohorts';
 import { Icons } from './Icons';
 
 type Route = 'dashboard' | 'reports' | 'detail' | 'history' | 'settings';

@@ -1047,3 +1047,79 @@ a { color: inherit; text-decoration: none; }
   text-align: center;
   color: var(--ink-4);
 }
+
+/* Cohort sidebar configure button */
+.side__item--cohort .side__item-configure {
+  opacity: 0;
+  margin-left: auto;
+  padding: 2px;
+  color: var(--ink-4);
+  transition: opacity 120ms, color 120ms;
+  flex-shrink: 0;
+}
+.side__item--cohort:hover .side__item-configure { opacity: 1; }
+.side__item-configure:hover { color: var(--ink) !important; }
+
+/* Intern editor (used in cohort modals) */
+.intern-editor {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.intern-editor__list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.intern-editor__empty {
+  font-size: 12.5px;
+  color: var(--ink-4);
+  padding: 8px 0;
+}
+.intern-editor__item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border-radius: var(--radius);
+  background: var(--bg-2);
+  border: 1px solid var(--line-2);
+}
+.intern-editor__item--editing {
+  background: var(--bg);
+  border-color: var(--line);
+}
+.intern-editor__item--editing .input {
+  padding: 5px 8px;
+  font-size: 13px;
+}
+.intern-editor__item-name {
+  font-size: 13px;
+  font-weight: 500;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.intern-editor__item-handle {
+  font-size: 12px;
+  font-family: var(--mono);
+  color: var(--ink-4);
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.intern-editor__add-row {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  margin-top: 4px;
+}
+.intern-editor__add-row .input {
+  flex: 1;
+  font-size: 13px;
+  padding: 7px 10px;
+}
