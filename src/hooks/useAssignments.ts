@@ -34,7 +34,7 @@ const updateGlobs = (
 
 type GlobUpdateType = "ADD" | "REMOVE";
 
-export const useAssignments = (cohortId: number, initialAssignmentId?: string) => {
+export const useAssignments = (cohortId: string, initialAssignmentId?: string) => {
   const [assignments, setAssignments] = useState<Assignment[]>([]);
   const [error, setError] = useState<Error | null>(null);
   const [loaded, setLoaded] = useState(false);
@@ -43,7 +43,7 @@ export const useAssignments = (cohortId: number, initialAssignmentId?: string) =
   );
 
   useEffect(() => {
-    if (!loaded && cohortId !== -1) {
+    if (!loaded && cohortId !== "") {
       fetchAssignments(cohortId)
         .then((assignments) => {
           setAssignments(assignments);

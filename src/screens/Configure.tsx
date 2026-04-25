@@ -121,7 +121,7 @@ const PromptSection = ({ prompt, setPrompt, model, setModel, availableModels }: 
 };
 
 interface ConfigureModalProps {
-  cohortId: number;
+  cohortId: string;
   assignmentId: string;
   onClose: () => void;
 }

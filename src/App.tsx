@@ -1,8 +1,7 @@
 import { useEffect, useState } from 'react';
+import { useCohorts } from './components/Cohort';
 import { Sidebar, Topbar } from './components/Shell';
 import { TwicksSection, type Tweaks } from './components/TweaksPanel';
-import { useCohorts } from './components/Cohort';
-import type { Cohort } from './api';
 import { ScreenDashboard } from './screens/Dashboard';
 import { ScreenDetail } from './screens/Detail';
 import { ScreenReports } from './screens/Reports';
@@ -21,10 +20,10 @@ export default function App() {
 
   const cohortsState = useCohorts();
   const cohorts = cohortsState.cohorts;
-  const [selectedCohortId, setSelectedCohortId] = useState<number | null>(null);
+  const [selectedCohortId, setSelectedCohortId] = useState("");
 
   useEffect(() => {
-    if (cohortsState.cohorts.length > 0 && selectedCohortId === null) {
+    if (cohortsState.cohorts.length > 0 && selectedCohortId === "") {
       setSelectedCohortId(cohorts[0].id);
     }
   }, [cohorts, selectedCohortId]);
@@ -45,7 +44,7 @@ export default function App() {
         {route === 'dashboard' && (
           <ScreenDashboard
             onOpen={() => setRoute('reports')}
-            cohort={cohortsState.selectedCohort || { id: -1, name: "loading..." }}
+            cohort={cohortsState.selectedCohort || { id: "", name: "loading..." }}
           />
         )}
         {route === 'reports' && (

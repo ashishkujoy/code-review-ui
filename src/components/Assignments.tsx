@@ -79,7 +79,7 @@ const Meta = (props: {
   </div>
 }
 
-const Assignments = (props: { cohortId: number; onOpen: () => void }) => {
+const Assignments = (props: { cohortId: string; onOpen: () => void }) => {
   const { assignments } = useAssignments(props.cohortId);
   const [configuringId, setConfiguringId] = useState<string | null>(null);
 

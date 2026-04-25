@@ -2,7 +2,7 @@ import type { Assignment } from "./data";
 
 const BASE_URL = '/api';
 
-export type Cohort = { id: number; name: string; startDate?: string };
+export type Cohort = { id: string; name: string; startDate?: string };
 
 export async function fetchCohorts(): Promise<Cohort[]> {
   const res = await fetch(`${BASE_URL}/cohorts`);
@@ -25,7 +25,7 @@ export async function createCohort(data: {
 }
 
 export const fetchAssignments = async (
-  cohortId: number,
+  cohortId: string,
 ): Promise<Assignment[]> => {
   const res = await fetch(`${BASE_URL}/cohorts/${cohortId}/assignments`);
   if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
@@ -52,7 +52,7 @@ export const createAssignment = async (
 };
 
 export const updateAssignment = async (
-  cohortId: number,
+  cohortId: string,
   assignment: Assignment,
 ) => {
   const res = await fetch(`${BASE_URL}/cohorts/${cohortId}/assignments/${assignment.id}`, {

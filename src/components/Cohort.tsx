@@ -7,8 +7,8 @@ export interface CohortProps {
   cohorts: CohortData[];
   loading: boolean;
   error: Error | null;
-  selectedId: number | null;
-  onSelect: (id: number) => void;
+  selectedId: string | null;
+  onSelect: (id: string) => void;
   onCohortCreated: (cohort: CohortData) => void;
 }
 
@@ -63,9 +63,9 @@ export const useCohorts = (): CohortsState => {
   const [cohorts, setCohorts] = useState<CohortData[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
-  const [selectedId, setSelectedId] = useState<number | null>(null);
+  const [selectedId, setSelectedId] = useState<string>("");
 
-  const selectedCohort = selectedId === null ? null : cohorts.find(cohort => cohort.id === selectedId) || null;
+  const selectedCohort = cohorts.find(cohort => cohort.id === selectedId) || null;
 
   useEffect(() => {
     fetchCohorts()
@@ -77,7 +77,7 @@ export const useCohorts = (): CohortsState => {
           return b.startDate.localeCompare(a.startDate);
         });
         setCohorts(sorted);
-        setSelectedId(sorted[0]?.id || null);
+        setSelectedId(sorted[0]?.id || "");
       })
       .catch((err: unknown) => setError(err instanceof Error ? err : new Error(String(err))))
       .finally(() => setLoading(false));
@@ -101,7 +101,7 @@ export const useCohorts = (): CohortsState => {
     loading,
     error,
     onSelect: setSelectedId,
-    selectedId: selectedId || -1,
+    selectedId: selectedId || "",
     selectedCohort,
     onCohortCreated,
   };
