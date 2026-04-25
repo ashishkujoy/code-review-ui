@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useAssignments } from '../components/Assignments';
+import { useAssignments } from '../hooks/useAssignments';
 import { Button } from '../components/Button';
 import { Icons } from '../components/Icons';
 
@@ -9,7 +9,7 @@ const GlobRow = ({ type, glob, onClick }: { type: string; glob: string; onClick:
   <div className="glob">
     <span className={`glob__mode glob__mode--${type}`}>{type === 'inc' ? 'INC' : 'EXC'}</span>
     <span className="glob__pattern">{glob}</span>
-    <button className="glob__rm" onClick={onClick}>{Icons.x}</button>
+    <button type="button" className="glob__rm" onClick={onClick}>{Icons.x}</button>
   </div>
 );
 
@@ -30,8 +30,8 @@ const GlobList = ({ includes, excludes, removeGlob }: {
 
 const GlobModes = ({ mode, setMode }: { mode: GlobMode; setMode: (m: GlobMode) => void }) => (
   <div className="seg">
-    <button className={mode === 'inc' ? 'is-on' : ''} onClick={() => setMode('inc')}>Include</button>
-    <button className={mode === 'exc' ? 'is-on' : ''} onClick={() => setMode('exc')}>Exclude</button>
+    <button type="button" className={mode === 'inc' ? 'is-on' : ''} onClick={() => setMode('inc')}>Include</button>
+    <button type="button" className={mode === 'exc' ? 'is-on' : ''} onClick={() => setMode('exc')}>Exclude</button>
   </div>
 );
 
@@ -50,14 +50,14 @@ const GlobInput = ({ onSubmit }: { onSubmit: (g: string) => void }) => {
         placeholder="e.g. src/**/*.ts"
         value={glob}
         onChange={(e) => setGlob(e.target.value)}
-        onKeyDown={(e) => e.key === 'Enter' && submit()}
+        onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); submit(); } }}
       />
-      <button className="btn" onClick={submit}>Add</button>
+      <button type="button" className="btn" onClick={submit}>Add</button>
     </>
   );
 };
 
-const GlobSection = ({ includes, excludes, removeGlob, addGlob }: {
+export const GlobSection = ({ includes, excludes, removeGlob, addGlob }: {
   includes: string[];
   excludes: string[];
   removeGlob: (m: GlobMode, i: number) => void;
@@ -127,16 +127,8 @@ interface ConfigureModalProps {
 }
 
 export function ConfigureModal({ cohortId, assignmentId, onClose }: ConfigureModalProps) {
-  const assignments = useAssignments(cohortId);
+  const assignments = useAssignments(cohortId, assignmentId);
   const [running, setRunning] = useState(false);
-
-  useEffect(() => {
-    if (assignments.loaded) {
-      const match = assignments.assignments.find((a) => a.id === assignmentId);
-      if (match) assignments.setSelectedAssignment(match);
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [assignments.loaded, assignmentId]);
 
   const runReview = () => {
     if (running) return;

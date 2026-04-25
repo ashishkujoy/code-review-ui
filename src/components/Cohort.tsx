@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
 import { type Cohort as CohortData, fetchCohorts } from '../api';
+import { CreateCohortModal } from './CreateCohortModal';
+import { Icons } from './Icons';
 
 export interface CohortProps {
   cohorts: CohortData[];
@@ -7,12 +9,25 @@ export interface CohortProps {
   error: Error | null;
   selectedId: number | null;
   onSelect: (id: number) => void;
+  onCohortCreated: (cohort: CohortData) => void;
 }
 
-export const Cohort = ({ cohorts, loading, error, selectedId, onSelect }: CohortProps) => {
+export const Cohort = ({ cohorts, loading, error, selectedId, onSelect, onCohortCreated }: CohortProps) => {
+  const [showModal, setShowModal] = useState(false);
+
   return (
     <div>
-      <div className="side__section-title">Cohorts</div>
+      <div className="side__section-title" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <span>Cohorts</span>
+        <button
+          className="btn btn--ghost btn--icon"
+          style={{ padding: 2 }}
+          onClick={() => setShowModal(true)}
+          title="New cohort"
+        >
+          {Icons.plus}
+        </button>
+      </div>
       <nav className="side__nav">
         {loading && <div className="side__item">Loading…</div>}
         {error && <div className="side__item" style={{ color: 'var(--danger)' }}>Failed to load</div>}
@@ -27,6 +42,15 @@ export const Cohort = ({ cohorts, loading, error, selectedId, onSelect }: Cohort
           </div>
         ))}
       </nav>
+      {showModal && (
+        <CreateCohortModal
+          onClose={() => setShowModal(false)}
+          onCreated={(cohort) => {
+            onCohortCreated(cohort);
+            setShowModal(false);
+          }}
+        />
+      )}
     </div>
   );
 };
@@ -46,19 +70,39 @@ export const useCohorts = (): CohortsState => {
   useEffect(() => {
     fetchCohorts()
       .then((cohorts) => {
-        setCohorts(cohorts);
-        setSelectedId(cohorts[0]?.id || null)
+        const sorted = [...cohorts].sort((a, b) => {
+          if (!a.startDate && !b.startDate) return 0;
+          if (!a.startDate) return 1;
+          if (!b.startDate) return -1;
+          return b.startDate.localeCompare(a.startDate);
+        });
+        setCohorts(sorted);
+        setSelectedId(sorted[0]?.id || null);
       })
       .catch((err: unknown) => setError(err instanceof Error ? err : new Error(String(err))))
       .finally(() => setLoading(false));
   }, []);
+
+  const onCohortCreated = (cohort: CohortData) => {
+    setCohorts((prev) => {
+      const next = [...prev, cohort];
+      return next.sort((a, b) => {
+        if (!a.startDate && !b.startDate) return 0;
+        if (!a.startDate) return 1;
+        if (!b.startDate) return -1;
+        return b.startDate.localeCompare(a.startDate);
+      });
+    });
+    setSelectedId(cohort.id);
+  };
 
   return {
     cohorts,
     loading,
     error,
     onSelect: setSelectedId,
-    selectedId: selectedId || -1, selectedCohort
+    selectedId: selectedId || -1,
+    selectedCohort,
+    onCohortCreated,
   };
 };
-

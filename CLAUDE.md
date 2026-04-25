@@ -29,6 +29,8 @@ Vite + React 19 + TypeScript SPA. No router library — navigation is managed by
 - `Reports.tsx` — split pane (intern list left, detail right) with filter/sort/search, histogram, score breakdown, findings list
 - `Detail.tsx` — full single-intern report with tabbed views (Findings / Summary / Files / Prompt & Run)
 
+**`src/hooks/`** — custom React hooks. All API calls and async data-fetching logic must live here, not in components. Each hook file exports a single hook (e.g. `useAssignments.ts`, `useCohorts.ts`). Components call hooks to get data and trigger actions — they do not call API functions directly.
+
 **Styling** — all CSS lives in `src/index.css` as a single flat stylesheet using CSS custom properties. Design tokens are defined on `:root` (light) and `[data-theme="dark"]`. Density variants are driven by `[data-density="compact"]` on `<html>`. No CSS modules, no Tailwind. Class names follow a BEM-like convention matching the original prototype (`chip`, `chip--good`, `intern-row`, `split__left`, etc.).
 
 **Theme/density** — `App.tsx` holds `tweaks` state and writes `data-theme` / `data-density` attributes to `document.documentElement`. A floating tweaks panel (bottom-right) lets you toggle them at runtime. The current route is persisted to `localStorage` under the key `cr.route`.
